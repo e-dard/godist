@@ -112,7 +112,7 @@ func Test_SampleVar(t *testing.T) {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
 
-		if !util.FloatsEqual(actual, ex.out, 0.02) {
+		if !util.FloatsPicoEqual(actual, ex.out) {
 			t.Fatalf("expected %v\n got %v\n", ex.out, actual)
 		}
 	}
