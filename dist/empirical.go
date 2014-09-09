@@ -5,26 +5,57 @@ import (
 	"sort"
 )
 
-var EmptyInputError = fmt.Errorf("Input slice is empty")
+type Empirical struct {
+	sample    []float64
+	n         float64
+	mean      float64
+	median    float64
+	medianIdx int
+	variance  float64
+}
 
-// SampleMean returns the mean of the input values.
-func SampleMean(values []float64) (float64, error) {
+var EmptyInputError = fmt.Errorf("No values in sample")
+
+func (e *Empirical) Add(values ...float64) {
 	if len(values) == 0 {
+		return
+	}
+
+	e.sample = append(e.sample, values...)
+
+	if len(e.sample) == 1 {
+
+	}
+
+	for _, v := range values {
+		if e.n == 0 {
+			e.mean, e.median = values[0], values[0]
+			e.n++
+			continue
+		}
+
+		oldM := e.mean
+		e.n++
+		e.mean += (v - e.mean) / e.n
+		e.variance += (v - oldM) * (v - e.mean)
+	}
+
+}
+
+// Mean returns the mean of the input values.
+func (e Empirical) Mean() (float64, error) {
+	if len(e.sample) == 0 {
 		return 0.0, EmptyInputError
 	}
-
-	var sum float64
-	for _, v := range values {
-		sum += v
-	}
-	return sum / float64(len(values)), nil
+	return e.mean, nil
 }
 
 // SampleMedian returns the median of the input values.
 //
 // In the case that the length of the input values is even, the mean of
 // the two middle values is returned.
-func SampleMedian(values []float64) (float64, error) {
+func (e Empirical) SampleMedian() (float64, error) {
+	values := e.sample
 	if len(values) == 0 {
 		return 0.0, EmptyInputError
 	}
@@ -40,7 +71,8 @@ func SampleMedian(values []float64) (float64, error) {
 //
 // If the input value distribution is multi-modal then the smallest mode
 // is returned.
-func SampleMode(values []float64) (float64, error) {
+func (e Empirical) SampleMode() (float64, error) {
+	values := e.sample
 	if len(values) == 0 {
 		return 0.0, EmptyInputError
 	}
@@ -62,15 +94,10 @@ func SampleMode(values []float64) (float64, error) {
 	return values[modei], nil
 }
 
-// SampleVar returns the variance of the input values.
-func SampleVar(values []float64) (float64, error) {
-	if len(values) == 0 {
+// Variance returns the variance of the input values.
+func (e Empirical) Variance() (float64, error) {
+	if len(e.sample) == 0 {
 		return 0.0, EmptyInputError
 	}
-	mu, _ := SampleMean(values)
-	var sum float64
-	for _, v := range values {
-		sum += (v - mu) * (v - mu)
-	}
-	return sum / float64(len(values)), nil
+	return e.variance / e.n, nil
 }

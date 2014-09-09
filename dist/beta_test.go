@@ -179,8 +179,10 @@ func genBetaDist(b Beta, size int) dist {
 	}
 
 	d := dist{}
-	d.mean, _ = SampleMean(sample)
-	d.median, _ = SampleMedian(sample)
-	d.variance, _ = SampleVar(sample)
+	ed := Empirical{}
+	ed.Add(sample...)
+	d.mean, _ = ed.Mean()
+	d.median, _ = ed.SampleMedian()
+	d.variance, _ = ed.Variance()
 	return d
 }

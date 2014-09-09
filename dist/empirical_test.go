@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Test_SampleMean(t *testing.T) {
+func Test_Mean(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
@@ -21,7 +21,9 @@ func Test_SampleMean(t *testing.T) {
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleMean(ex.in)
+		em := Empirical{}
+		em.Add(ex.in...)
+		actual, err := em.Mean()
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
@@ -49,7 +51,7 @@ func Test_SampleMedian(t *testing.T) {
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleMedian(ex.in)
+		actual, err := Empirical{sample: ex.in}.SampleMedian()
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
@@ -80,7 +82,7 @@ func Test_SampleMode(t *testing.T) {
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleMode(ex.in)
+		actual, err := Empirical{sample: ex.in}.SampleMode()
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
@@ -91,7 +93,7 @@ func Test_SampleMode(t *testing.T) {
 	}
 }
 
-func Test_SampleVar(t *testing.T) {
+func Test_Variance(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
@@ -107,7 +109,9 @@ func Test_SampleVar(t *testing.T) {
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleVar(ex.in)
+		em := Empirical{}
+		em.Add(ex.in...)
+		actual, err := em.Variance()
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
