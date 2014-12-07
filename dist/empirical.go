@@ -1,55 +1,121 @@
 package dist
 
-import (
-	"fmt"
-	"sort"
-)
+import "sort"
 
-var EmptyInputError = fmt.Errorf("Input slice is empty")
+type Empirical struct {
+	sample   []float64
+	mean     float64
+	median   float64
+	mode     float64
+	variance float64
+	n        float64
+	medStale bool
+	modStale bool
+}
 
-// SampleMean returns the mean of the input values.
-func SampleMean(values []float64) (float64, error) {
+func (e *Empirical) Add(values ...float64) {
 	if len(values) == 0 {
-		return 0.0, EmptyInputError
+		return
 	}
+	e.sample = append(e.sample, values...)
 
-	var sum float64
+	// update moments
 	for _, v := range values {
-		sum += v
+		if e.n == 0 {
+			e.n = 1
+			e.mean, e.median, e.mode = values[0], values[0], values[0]
+			e.medStale, e.modStale = false, false
+			continue
+		}
+
+		// update running mean and variance
+		e.n++
+		curmean := e.mean
+		e.mean += (v - e.mean) / e.n
+		e.variance += (v - curmean) * (v - e.mean)
+
+		// check if we need to make the current median/mods values
+		// stale.
+		if v != e.median {
+			e.medStale = true
+		}
+
+		if v != e.mode {
+			e.modStale = true
+		}
 	}
-	return sum / float64(len(values)), nil
+
 }
 
-// SampleMedian returns the median of the input values.
+// Mean returns the distribution mean.
+func (e *Empirical) Mean() (float64, error) {
+	if len(e.sample) == 0 {
+		msg := "mean cannot be calculated on empty distribution."
+		return 0.0, EmptyDistributionError{s: msg}
+	}
+	return e.mean, nil
+}
+
+// Median calculates the distribution median.
 //
-// In the case that the length of the input values is even, the mean of
+// Median returns a memoised median if either: (1) the distribution has
+// not been updated since the last call to Median, or (2) all values
+// added to the distribution since the last call are equal to the median
+// of the distribution.
+//
+// In the case that the distribution sample size is even, the mean of
 // the two middle values is returned.
-func SampleMedian(values []float64) (float64, error) {
-	if len(values) == 0 {
-		return 0.0, EmptyInputError
+func (e *Empirical) Median() (float64, error) {
+	if len(e.sample) == 0 {
+		msg := "median cannot be calculated on empty distribution."
+		return 0.0, EmptyDistributionError{s: msg}
 	}
-	sort.Float64s(values)
-	mid := len(values) / 2
-	if len(values)%2 == 1 {
-		return values[mid], nil
+
+	if !e.medStale {
+		// no new values, or only values equal to current median added
+		return e.median, nil
 	}
-	return (values[mid-1] + values[mid]) / 2.0, nil
+
+	e.medStale = false
+	// sort sample to find median value
+	sort.Float64s(e.sample)
+	mid := int64(e.n) / 2
+	if int64(e.n)%2 == 1 {
+		e.median = e.sample[mid]
+		return e.median, nil
+	}
+	e.median = (e.sample[mid-1] + e.sample[mid]) / 2.0
+	return e.median, nil
 }
 
-// SampleMode returns the mode of the input values.
+// Mode calculates the distribution mode.
 //
-// If the input value distribution is multi-modal then the smallest mode
+// Mode returns a memoised if either: (1) the distribution has not been
+// updated since the last call to Mode, or (2) all values added to the
+// distribution since the last call are equal to the mode of the
+// distribution.
+//
+// In the case that the distribution is multi-modal, the smallest mode
 // is returned.
-func SampleMode(values []float64) (float64, error) {
-	if len(values) == 0 {
-		return 0.0, EmptyInputError
+func (e *Empirical) Mode() (float64, error) {
+	if len(e.sample) == 0 {
+		msg := "mode cannot be calculated on empty distribution."
+		return 0.0, EmptyDistributionError{s: msg}
 	}
-	sort.Float64s(values)
+
+	if !e.modStale {
+		// no new values, or only values equal to current median added
+		return e.mode, nil
+	}
+
+	e.modStale = false
+	sort.Float64s(e.sample)
+
 	modei, maxc := 0, 1
-	for i := 0; i < len(values); i++ {
+	for i := 0; i < int(e.n); i++ {
 		count := 1
-		for j := i + 1; j < len(values); j++ {
-			if values[j] != values[i] {
+		for j := i + 1; j < int(e.n); j++ {
+			if e.sample[j] != e.sample[i] {
 				break
 			}
 			count++
@@ -59,18 +125,15 @@ func SampleMode(values []float64) (float64, error) {
 			modei, maxc = i, count
 		}
 	}
-	return values[modei], nil
+	e.mode = e.sample[modei]
+	return e.mode, nil
 }
 
-// SampleVar returns the variance of the input values.
-func SampleVar(values []float64) (float64, error) {
-	if len(values) == 0 {
-		return 0.0, EmptyInputError
+// Variance returns the distribution variance.
+func (e *Empirical) Variance() (float64, error) {
+	if len(e.sample) == 0 {
+		msg := "variance cannot be calculated on empty distribution."
+		return 0.0, EmptyDistributionError{s: msg}
 	}
-	mu, _ := SampleMean(values)
-	var sum float64
-	for _, v := range values {
-		sum += (v - mu) * (v - mu)
-	}
-	return sum / float64(len(values)), nil
+	return e.variance / e.n, nil
 }

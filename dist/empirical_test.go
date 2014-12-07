@@ -1,27 +1,34 @@
 package dist
 
 import (
-	"github.com/e-dard/godist/util"
 	"testing"
+
+	"github.com/e-dard/godist/util"
 )
 
-func Test_SampleMean(t *testing.T) {
+func Test_Mean(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
 		out float64
 	}
 
+	e := EmptyDistributionError{
+		s: "mean cannot be calculated on empty distribution.",
+	}
+
 	examples := []Example{
 		Example{in: []float64{1.1}, out: 1.1},
 		Example{in: []float64{1.1, 1.1}, out: 1.1},
 		Example{in: []float64{1.5, 3.0, 3.0}, out: 2.5},
-		Example{in: []float64{}, err: EmptyInputError},
-		Example{in: nil, err: EmptyInputError},
+		Example{in: []float64{}, err: e},
+		Example{in: nil, err: e},
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleMean(ex.in)
+		em := Empirical{}
+		em.Add(ex.in...)
+		actual, err := em.Mean()
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
@@ -32,11 +39,15 @@ func Test_SampleMean(t *testing.T) {
 	}
 }
 
-func Test_SampleMedian(t *testing.T) {
+func Test_Median(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
 		out float64
+	}
+
+	e := EmptyDistributionError{
+		s: "median cannot be calculated on empty distribution.",
 	}
 
 	examples := []Example{
@@ -44,12 +55,15 @@ func Test_SampleMedian(t *testing.T) {
 		Example{in: []float64{1.1, 1.1}, out: 1.1},
 		Example{in: []float64{1.1, 3.1, 2.0}, out: 2.0},
 		Example{in: []float64{1.1, 2.0, 3.0, 4.1}, out: 2.5},
-		Example{in: []float64{}, err: EmptyInputError},
-		Example{in: nil, err: EmptyInputError},
+		Example{in: []float64{}, err: e},
+		Example{in: nil, err: e},
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleMedian(ex.in)
+		dist := Empirical{}
+		dist.Add(ex.in...)
+
+		actual, err := dist.Median()
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
@@ -67,6 +81,10 @@ func Test_SampleMode(t *testing.T) {
 		out float64
 	}
 
+	e := EmptyDistributionError{
+		s: "mode cannot be calculated on empty distribution.",
+	}
+
 	examples := []Example{
 		Example{in: []float64{1.1}, out: 1.1},
 		Example{in: []float64{1.1, 1.1}, out: 1.1},
@@ -75,12 +93,15 @@ func Test_SampleMode(t *testing.T) {
 		Example{in: []float64{2.0, 1.1, 1.1}, out: 1.1},
 		Example{in: []float64{2.0, 1.1, 1.1, 2.0}, out: 1.1},
 		Example{in: []float64{1.1, 2.0, 1.1, 2.0, 2.0, 3.021}, out: 2.0},
-		Example{in: []float64{}, err: EmptyInputError},
-		Example{in: nil, err: EmptyInputError},
+		Example{in: []float64{}, err: e},
+		Example{in: nil, err: e},
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleMode(ex.in)
+		dist := Empirical{}
+		dist.Add(ex.in...)
+		actual, err := dist.Mode()
+
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
@@ -91,23 +112,29 @@ func Test_SampleMode(t *testing.T) {
 	}
 }
 
-func Test_SampleVar(t *testing.T) {
+func Test_Variance(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
 		out float64
 	}
 
+	e := EmptyDistributionError{
+		s: "variance cannot be calculated on empty distribution.",
+	}
+
 	examples := []Example{
 		Example{in: []float64{1.1}, out: 0.0},
 		Example{in: []float64{1.1, 1.1}, out: 0.0},
 		Example{in: []float64{1.1, 1.1, 4.1}, out: 2.0},
-		Example{in: []float64{}, err: EmptyInputError},
-		Example{in: nil, err: EmptyInputError},
+		Example{in: []float64{}, err: e},
+		Example{in: nil, err: e},
 	}
 
 	for _, ex := range examples {
-		actual, err := SampleVar(ex.in)
+		em := Empirical{}
+		em.Add(ex.in...)
+		actual, err := em.Variance()
 		if err != ex.err {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
