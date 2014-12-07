@@ -2,10 +2,11 @@ package dist
 
 import (
 	"fmt"
-	"github.com/e-dard/godist/util"
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/e-dard/godist/util"
 )
 
 type betaExample struct {
@@ -182,7 +183,7 @@ func genBetaDist(b Beta, size int) dist {
 	ed := Empirical{}
 	ed.Add(sample...)
 	d.mean, _ = ed.Mean()
-	d.median, _ = ed.SampleMedian()
+	d.median, _ = ed.Median()
 	d.variance, _ = ed.Variance()
 	return d
 }
