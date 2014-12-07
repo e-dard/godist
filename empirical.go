@@ -67,7 +67,7 @@ func (e *Empirical) Add(values ...float64) {
 func (e *Empirical) Mean() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "mean cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{S: msg}
+		return 0.0, InvalidDistributionError{S: msg}
 	}
 	return e.mean, nil
 }
@@ -84,7 +84,7 @@ func (e *Empirical) Mean() (float64, error) {
 func (e *Empirical) Median() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "median cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{S: msg}
+		return 0.0, InvalidDistributionError{S: msg}
 	}
 
 	if !e.medStale {
@@ -116,7 +116,7 @@ func (e *Empirical) Median() (float64, error) {
 func (e *Empirical) Mode() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "mode cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{S: msg}
+		return 0.0, InvalidDistributionError{S: msg}
 	}
 
 	if !e.modStale {
@@ -149,7 +149,7 @@ func (e *Empirical) Mode() (float64, error) {
 func (e *Empirical) Variance() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "variance cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{S: msg}
+		return 0.0, InvalidDistributionError{S: msg}
 	}
 	return e.variance / e.n, nil
 }
@@ -159,7 +159,7 @@ func (e *Empirical) Variance() (float64, error) {
 func (e *Empirical) Float64() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "cannot draw a random value on an empty distribution."
-		return 0.0, EmptyDistributionError{S: msg}
+		return 0.0, InvalidDistributionError{S: msg}
 	}
 	i := rand.Intn(len(e.sample))
 	return e.sample[i], nil

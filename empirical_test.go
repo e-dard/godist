@@ -15,8 +15,8 @@ func Test_Empirical_Mean(t *testing.T) {
 		out float64
 	}
 
-	e := EmptyDistributionError{
-		s: "mean cannot be calculated on empty distribution.",
+	e := InvalidDistributionError{
+		S: "mean cannot be calculated on empty distribution.",
 	}
 
 	examples := []Example{
@@ -48,8 +48,8 @@ func Test_Empirical_Median(t *testing.T) {
 		out float64
 	}
 
-	e := EmptyDistributionError{
-		s: "median cannot be calculated on empty distribution.",
+	e := InvalidDistributionError{
+		S: "median cannot be calculated on empty distribution.",
 	}
 
 	examples := []Example{
@@ -83,8 +83,8 @@ func Test_Empirical_SampleMode(t *testing.T) {
 		out float64
 	}
 
-	e := EmptyDistributionError{
-		s: "mode cannot be calculated on empty distribution.",
+	e := InvalidDistributionError{
+		S: "mode cannot be calculated on empty distribution.",
 	}
 
 	examples := []Example{
@@ -121,8 +121,8 @@ func Test_Empirical_Variance(t *testing.T) {
 		out float64
 	}
 
-	e := EmptyDistributionError{
-		s: "variance cannot be calculated on empty distribution.",
+	e := InvalidDistributionError{
+		S: "variance cannot be calculated on empty distribution.",
 	}
 
 	examples := []Example{

@@ -13,6 +13,10 @@ type betaExample struct {
 	out float64
 }
 
+func Test_Beta_Imp_Distribution(t *testing.T) {
+	var _ Distribution = Beta{}
+}
+
 func Test_Beta_Mean(t *testing.T) {
 	examples := []betaExample{
 		betaExample{in: Beta{Alpha: 1, Beta: 1}, out: 0.5},
@@ -123,7 +127,7 @@ func Test_Beta_Variance(t *testing.T) {
 }
 
 // tests random variate generation for values using Jöhnk's algorithm
-func Test_Float64(t *testing.T) {
+func Test_Beta_Float64(t *testing.T) {
 	inputs := []Beta{
 		// use Jöhnk
 		Beta{Alpha: 0.45, Beta: 0.45},

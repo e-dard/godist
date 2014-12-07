@@ -1,20 +1,22 @@
+// Package godist provides a collection of useful continuous and
+// discrete probability distributions, as well as helpful associated
+// methods around them.
+//
 package godist
 
-type EmptyDistributionError struct{ s string }
+type InvalidDistributionError struct{ S string }
+type UnsupportedError struct{ S string }
 
-func (e EmptyDistributionError) Error() string { return e.s }
+func (e InvalidDistributionError) Error() string { return e.S }
+func (e UnsupportedError) Error() string         { return e.S }
 
+// Distribution is the interface that defines useful methods for
+// understanding specific instances of distributions, and sampling
+// random variates from them.
 type Distribution interface {
-	// distribution mean
 	Mean() (float64, error)
-
-	// distribution median
 	Median() (float64, error)
-
-	// distribution mode
 	Mode() (float64, error)
-
-	// distribution variance
 	Variance() (float64, error)
 
 	// generate a random value according to the probability distribution
