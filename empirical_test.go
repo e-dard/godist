@@ -1,9 +1,7 @@
-package dist
+package godist
 
 import (
 	"testing"
-
-	"github.com/e-dard/godist/util"
 )
 
 func Test_Mean(t *testing.T) {
@@ -139,7 +137,7 @@ func Test_Variance(t *testing.T) {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
 
-		if !util.FloatsPicoEqual(actual, ex.out) {
+		if !floatsPicoEqual(actual, ex.out) {
 			t.Fatalf("expected %v\n got %v\n", ex.out, actual)
 		}
 	}

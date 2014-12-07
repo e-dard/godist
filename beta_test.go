@@ -1,12 +1,10 @@
-package dist
+package godist
 
 import (
 	"fmt"
 	"math/rand"
 	"testing"
 	"time"
-
-	"github.com/e-dard/godist/util"
 )
 
 type betaExample struct {
@@ -36,7 +34,7 @@ func Test_Beta_Mean(t *testing.T) {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
 
-		if !util.FloatsPicoEqual(actual, ex.out) {
+		if !floatsPicoEqual(actual, ex.out) {
 			t.Fatalf("expected %v\n got %v\n", ex.out, actual)
 		}
 	}
@@ -67,7 +65,7 @@ func Test_Beta_Median(t *testing.T) {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
 
-		if !util.FloatsPicoEqual(actual, ex.out) {
+		if !floatsPicoEqual(actual, ex.out) {
 			t.Fatalf("expected %v\n got %v\n", ex.out, actual)
 		}
 	}
@@ -94,7 +92,7 @@ func Test_Beta_Mode(t *testing.T) {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
 
-		if !util.FloatsPicoEqual(actual, ex.out) {
+		if !floatsPicoEqual(actual, ex.out) {
 			t.Fatalf("expected %v\n got %v\n", ex.out, actual)
 		}
 	}
@@ -118,7 +116,7 @@ func Test_Beta_Variance(t *testing.T) {
 			t.Fatalf("expected %v\n got %v\n", ex.err, err)
 		}
 
-		if !util.FloatsPicoEqual(actual, ex.out) {
+		if !floatsPicoEqual(actual, ex.out) {
 			t.Fatalf("expected %v\n got %v\n", ex.out, actual)
 		}
 	}
@@ -146,19 +144,19 @@ func Test_Float64(t *testing.T) {
 	for _, b := range inputs {
 		actual := genBetaDist(b, 10001)
 		expMean, _ := b.Mean()
-		if !util.FloatsCentiEqual(actual.mean, expMean) {
+		if !floatsCentiEqual(actual.mean, expMean) {
 			msg := "[Mean] expected %v got %v for %#v\n"
 			t.Fatalf(msg, expMean, actual.mean, b)
 		}
 
 		expMed, _ := b.Median()
-		if !util.FloatsDeciEqual(actual.median, expMed) {
+		if !floatsDeciEqual(actual.median, expMed) {
 			msg := "[Median] expected %v got %v for %#v\n"
 			t.Fatalf(msg, expMed, actual.median, b)
 		}
 
 		expVar, _ := b.Variance()
-		if !util.FloatsDeciEqual(actual.variance, expVar) {
+		if !floatsDeciEqual(actual.variance, expVar) {
 			msg := "[Variance] expected %v got %v for %#v\n"
 			t.Fatalf(msg, expVar, actual.variance, b)
 		}
