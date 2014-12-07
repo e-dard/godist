@@ -1,7 +1,18 @@
 package godist
 
-import "sort"
+import (
+	"math/rand"
 
+	"sort"
+)
+
+// An Empirical distribution in the context of the godist package is
+// essentially just a sample of discrete values.
+//
+// All values added to an Empirical Distribution remain in memory, and
+// while some efficiencies have been made around memoising certain
+// values, in general calls to Median and Mode currently involve
+// re-sorting the entire sample in the Empirical distribution.
 type Empirical struct {
 	sample   []float64
 	mean     float64
@@ -13,6 +24,11 @@ type Empirical struct {
 	modStale bool
 }
 
+// Add adds one or more values to the empirical sample.
+//
+// Add carries out some operations to improve the efficiency of other
+// method calls, which is the main reason why the underlying sample
+// data-structure is not exported.
 func (e *Empirical) Add(values ...float64) {
 	if len(values) == 0 {
 		return
@@ -51,7 +67,7 @@ func (e *Empirical) Add(values ...float64) {
 func (e *Empirical) Mean() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "mean cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{s: msg}
+		return 0.0, EmptyDistributionError{S: msg}
 	}
 	return e.mean, nil
 }
@@ -68,7 +84,7 @@ func (e *Empirical) Mean() (float64, error) {
 func (e *Empirical) Median() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "median cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{s: msg}
+		return 0.0, EmptyDistributionError{S: msg}
 	}
 
 	if !e.medStale {
@@ -100,7 +116,7 @@ func (e *Empirical) Median() (float64, error) {
 func (e *Empirical) Mode() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "mode cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{s: msg}
+		return 0.0, EmptyDistributionError{S: msg}
 	}
 
 	if !e.modStale {
@@ -133,7 +149,18 @@ func (e *Empirical) Mode() (float64, error) {
 func (e *Empirical) Variance() (float64, error) {
 	if len(e.sample) == 0 {
 		msg := "variance cannot be calculated on empty distribution."
-		return 0.0, EmptyDistributionError{s: msg}
+		return 0.0, EmptyDistributionError{S: msg}
 	}
 	return e.variance / e.n, nil
+}
+
+// Float64 returns a randomly sampled value from the Empirical
+// distribution.
+func (e *Empirical) Float64() (float64, error) {
+	if len(e.sample) == 0 {
+		msg := "cannot draw a random value on an empty distribution."
+		return 0.0, EmptyDistributionError{S: msg}
+	}
+	i := rand.Intn(len(e.sample))
+	return e.sample[i], nil
 }

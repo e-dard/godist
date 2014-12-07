@@ -4,7 +4,11 @@ import (
 	"testing"
 )
 
-func Test_Mean(t *testing.T) {
+func Test_Empirical_Imp_Distribution(t *testing.T) {
+	var _ Distribution = &Empirical{}
+}
+
+func Test_Empirical_Mean(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
@@ -37,7 +41,7 @@ func Test_Mean(t *testing.T) {
 	}
 }
 
-func Test_Median(t *testing.T) {
+func Test_Empirical_Median(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
@@ -72,7 +76,7 @@ func Test_Median(t *testing.T) {
 	}
 }
 
-func Test_SampleMode(t *testing.T) {
+func Test_Empirical_SampleMode(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
@@ -110,7 +114,7 @@ func Test_SampleMode(t *testing.T) {
 	}
 }
 
-func Test_Variance(t *testing.T) {
+func Test_Empirical_Variance(t *testing.T) {
 	type Example struct {
 		in  []float64
 		err error
