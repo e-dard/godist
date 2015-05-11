@@ -154,6 +154,11 @@ func (e *Empirical) Variance() (float64, error) {
 	return e.variance / e.n, nil
 }
 
+// Size returns the number of samples in the distribution.
+func (e *Empirical) Size() float64 {
+	return e.n
+}
+
 // Float64 returns a randomly sampled value from the Empirical
 // distribution.
 func (e *Empirical) Float64() (float64, error) {
